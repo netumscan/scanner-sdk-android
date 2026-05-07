@@ -1,24 +1,20 @@
-# 平台权限与系统配置
+# Platform Permissions and System Configuration
 
-> 文档类型：接入指南
-> 目标读者：Android / iOS / macOS / Windows / Linux 接入方
-> 关联模块：`wrappers/`、`adapters/`
-> 更新条件：平台最低版本、权限声明、系统配置、传输实现变化时必须更新
-
-## 结论
-
-BLE、USB HID、USB Serial 都不是“只调 API 就能跑”的能力。接入方必须先满足系统权限、硬件开关和平台配置，否则 SDK 应返回明确 failure，而不是静默失败。
+BLE, USB HID, and USB Serial require platform permissions, enabled hardware, and
+system configuration before SDK calls can succeed. The SDK should return clear
+failures when these requirements are not met.
 
 ## Android
 
-BLE GATT 需要关注：
+BLE GATT requirements:
 
-- Android 12+：`BLUETOOTH_SCAN`、`BLUETOOTH_CONNECT`
-- Android 11 及以下：通常需要位置权限和系统定位开关
-- App 运行时权限必须在 discovery 前完成
-- 蓝牙开关必须开启
+- Android 12+: `BLUETOOTH_SCAN` and `BLUETOOTH_CONNECT`.
+- Android 11 and below: location permission and location services are commonly
+  required for BLE scanning.
+- Runtime permissions must be granted before discovery.
+- System Bluetooth must be enabled.
 
-推荐 Manifest：
+Recommended manifest:
 
 ```xml
 <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
@@ -28,7 +24,9 @@ BLE GATT 需要关注：
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
 ```
 
-`BLUETOOTH_SCAN` 的 `neverForLocation` 不是默认建议。只有宿主 App 明确不会用 BLE scan 推导位置，并且目标 ROM 验证通过，才可以加：
+`BLUETOOTH_SCAN` with `neverForLocation` is not the default recommendation. Use
+it only when the host app does not infer location from BLE scans and target ROMs
+have been verified:
 
 ```xml
 <uses-permission
@@ -36,113 +34,105 @@ BLE GATT 需要关注：
     android:usesPermissionFlags="neverForLocation" />
 ```
 
-如果加了这个 flag 后出现扫描不到设备，先用 demo 和 `nRF Connect` 对照验证，再决定是否移除该 flag 或补位置权限说明。
+If devices disappear after adding this flag, compare with the sample app and a
+BLE scanner such as `nRF Connect`, then decide whether to remove the flag or add
+location permission guidance.
 
-建议接入顺序：
+Recommended order:
 
-1. 检查蓝牙硬件是否存在。
-2. 检查蓝牙是否开启。
-3. 请求运行时权限。
-4. Android 11 及以下检查定位服务。
-5. 再调用 `startDiscovery()`。
-
-文档或 Demo 如果声明 Android BLE 可用，必须说明目标 Android 版本和权限处理方式。
+1. Check Bluetooth hardware availability.
+2. Check whether Bluetooth is enabled.
+3. Request runtime permissions.
+4. Check location services on Android 11 and below.
+5. Call `startDiscovery()`.
 
 ## iOS
 
-BLE GATT 需要关注：
+BLE GATT requirements:
 
-- `Info.plist` 中声明蓝牙使用说明。
-- App 首次使用 CoreBluetooth 时会触发系统授权。
-- 用户拒绝蓝牙权限后，SDK 只能给出 failure，不能自行恢复。
-- 后台扫描/连接不是默认能力，除非宿主 App 明确配置并验证。
+- Add a Bluetooth usage description to `Info.plist`.
+- CoreBluetooth prompts for authorization when first used.
+- If the user denies Bluetooth permission, the SDK can only report a failure.
+- Background scan/connect is not a default capability. It must be configured and
+  validated by the host app.
 
-推荐 `Info.plist`：
+Recommended `Info.plist`:
 
 ```xml
 <key>NSBluetoothAlwaysUsageDescription</key>
-<string>用于连接扫描枪设备并接收扫码数据</string>
+<string>Connect to scanner devices and receive scan data.</string>
 ```
 
-如需兼容旧工程模板，可以同时保留：
+Older project templates may also keep:
 
 ```xml
 <key>NSBluetoothPeripheralUsageDescription</key>
-<string>用于连接扫描枪设备并接收扫码数据</string>
+<string>Connect to scanner devices and receive scan data.</string>
 ```
 
-必须在接入文档中说明：
-
-- 是否支持后台模式。
-- App 如何提示用户打开蓝牙权限。
-- discovery 超时后的 UI 行为。
+Integration documentation should state whether background mode is supported, how
+the app guides users to enable Bluetooth permission, and what the UI does after a
+discovery timeout.
 
 ## macOS
 
-BLE GATT 需要关注：
+BLE GATT requirements:
 
-- App 需要蓝牙权限。
-- 沙盒 App 需要相应 entitlement。
-- 命令行 demo 和正式 App 的权限表现可能不同，不能互相替代验证。
+- The app needs Bluetooth permission.
+- Sandboxed apps need the appropriate entitlement.
+- Command-line samples and signed production apps may behave differently and
+  should not be treated as interchangeable validation.
 
-macOS 文档中写“已验证”时，必须说明是命令行 demo、开发态 App，还是正式签名 App。
+When macOS support is marked as verified, specify whether it was verified with a
+command-line sample, a development app, or a signed production app.
 
 ## Windows
 
-BLE GATT 需要关注：
+BLE GATT requirements:
 
-- Windows 10 19041+。
-- 蓝牙硬件和系统蓝牙开关。
-- WinRT BLE watcher 可能因为权限、策略、硬件或扫描冲突失败。
+- Windows 10 19041+.
+- Bluetooth hardware and system Bluetooth switch.
+- The WinRT BLE watcher can fail because of permissions, policy, hardware, or
+  scan conflicts.
 
-USB HID 需要关注：
+USB HID requirements:
 
-- 设备是否暴露 HID Report 通道。
-- 设备是否被其他程序占用。
-- report id、framing mode、读写 report 长度必须和设备画像一致。
+- The scanner must expose a HID Report channel.
+- The device must not be held by another process.
+- Report id, framing mode, and read/write report lengths must match the device
+  profile.
 
-USB Serial 需要关注：
+USB Serial requirements:
 
-- 串口名或设备 ID 是否正确。
-- 端口是否被其他程序占用。
-- 波特率、校验位、数据位、停止位必须记录在文档中。
-
-Windows 文档中写“可用”时，必须区分 BLE、USB HID、USB Serial，不能只写“Windows 支持”。
+- The COM port or device id must be correct.
+- The port must not be held by another process.
+- Baud rate, parity, data bits, and stop bits must be documented for the target
+  device mode.
 
 ## Linux
 
-Linux 当前仍是规划状态。后续落地时必须补齐：
+Linux support is still planned. Before marking it as verified, document:
 
-- BlueZ 版本要求。
-- D-Bus 权限要求。
-- udev 规则。
-- USB HID 访问权限。
-- 串口用户组要求，例如 `dialout`。
-- systemd service 或桌面 App 场景下的差异。
+- BlueZ version requirements;
+- D-Bus permission requirements;
+- udev rules;
+- USB HID access permissions;
+- serial user group requirements such as `dialout`;
+- differences between systemd services and desktop app scenarios.
 
-没有这些内容前，Linux 不能标为 `Verified`。
+## Failure Messages
 
-## 权限失败文案规则
+Permission and system failures should include:
 
-错误提示必须同时包含：
+- platform;
+- transport;
+- likely cause;
+- user action;
+- whether retry is possible.
 
-- 失败平台。
-- 失败传输。
-- 可能原因。
-- 用户可执行动作。
-- 是否可重试。
-
-示例：
+Example:
 
 ```text
 Windows BLE discovery failed: Bluetooth is disabled or unavailable.
 Turn on Bluetooth and retry discovery.
 ```
-
-## 关联文档
-
-- [android.md](android.md)
-- [ios.md](ios.md)
-- [windows.md](windows.md)
-- [linux.md](linux.md)
-- [../troubleshooting.md](../troubleshooting.md)

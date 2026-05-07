@@ -1,66 +1,62 @@
-# 安全与隐私
+# Security and Privacy
 
-> 文档类型：接入指南
-> 目标读者：SDK 接入方、Demo 维护者、发版执行人
-> 关联模块：`wrappers/`、`tools/`、`docs/`、发布产物
-> 更新条件：日志字段、权限、发布产物、依赖或漏洞处理流程变化时必须更新
+Scan content can contain business-sensitive data. SDK logs, sample apps, test
+logs, issue reports, and screenshots must not expose raw scan content by default.
 
-## 结论
+## Logging
 
-扫描内容可能是业务敏感数据。SDK、Demo、测试日志和 issue 都不能默认公开原始扫码内容。
+- Do not log full scan content by default.
+- Only log scan content in a user-enabled debug mode.
+- Redact issue reports, regression records, and screenshots before sharing.
+- Do not log tokens, certificates, authorization headers, Bluetooth pairing
+  information, or customer-private device identifiers.
+- Failure logs should keep error code, platform, transport, state-machine step,
+  and payload length instead of sensitive payloads.
 
-## 日志规则
+## Permission Disclosure
 
-- 默认日志不得输出完整扫码内容。
-- 必须输出扫码内容时，只能在用户主动开启的调试模式中输出。
-- 提交 issue、回归记录、截图前必须脱敏。
-- 不要记录 token、证书、授权头、蓝牙配对信息、客户私有设备编号。
-- failure log 应保留错误码、平台、传输、状态机节点和长度信息，而不是敏感 payload。
+Platform integration documentation must explain why permissions exist:
 
-## 权限说明规则
+- BLE scan: discover scanner devices.
+- BLE connect: establish a GATT connection.
+- Location: required only by older Android BLE scan behavior; it does not mean
+  the SDK needs business location data.
+- USB HID / Serial: communicate with wired devices.
 
-平台接入文档必须解释权限用途：
+Customers should not have to infer why a permission is required.
 
-- BLE scan：用于发现扫描枪。
-- BLE connect：用于建立 GATT 连接。
-- Location：仅 Android 旧系统 BLE 扫描要求，不表示 SDK 需要定位业务数据。
-- USB HID / Serial：用于和有线设备通信。
+## Release Artifacts
 
-不要让客户自己猜权限为什么存在。
+- Official release artifacts must come from reproducible scripts or CI.
+- Release packages must include version, checksum, and generation source.
+- Release packages must carry the `Netum Scanner SDK License`. The SDK is free
+  for commercial application integration, closed-source, and must not be
+  redistributed as a standalone SDK or component.
+- Do not use local temporary build directories as official distribution entry
+  points.
+- Do not publish build outputs or documentation that contain local absolute
+  paths.
 
-## 发布产物规则
+## Dependencies
 
-- 正式发布产物必须来自可复现脚本或 CI。
-- 发布包必须带版本号、校验和和生成来源。
-- 发布包必须携带 `Netum Scanner SDK License`；SDK 允许免费商用集成，但代码闭源，禁止把 SDK 作为独立组件重新分发。
-- 不要把本地临时构建目录当正式分发入口。
-- 不要把包含本机绝对路径的构建输出写进文档或发给客户。
+Before adding a dependency, document:
 
-## 依赖规则
+- why it is needed;
+- whether the standard library or an existing dependency can replace it;
+- whether the license is compatible;
+- whether it enters official release artifacts;
+- whether it affects mobile package size or desktop installation size.
 
-新增依赖前必须说明：
+## Vulnerability Handling
 
-- 为什么需要。
-- 是否已有标准库或现有依赖可替代。
-- 许可证是否兼容。
-- 是否进入正式发布产物。
-- 是否影响移动端包体积或桌面安装体积。
+When recording a security issue, include:
 
-## 漏洞处理
+- affected platform;
+- affected version;
+- trigger conditions;
+- potentially affected data types;
+- mitigation;
+- whether a patch release is required.
 
-如果发现安全问题，记录时必须包含：
-
-- 影响平台。
-- 影响版本。
-- 触发条件。
-- 可能影响的数据类型。
-- 缓解方式。
-- 是否需要发版修复。
-
-公开文档中不要贴可直接利用的敏感细节；先在私有渠道完成确认和修复。
-
-## 关联文档
-
-- [platforms/permissions.md](platforms/permissions.md)
-- [troubleshooting.md](troubleshooting.md)
-- [../architecture/release/versioning-and-abi.md](../architecture/release/versioning-and-abi.md)
+Do not publish directly exploitable details in public documentation before the
+issue is confirmed and fixed through a private channel.

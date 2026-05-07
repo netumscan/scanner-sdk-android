@@ -16,6 +16,10 @@ Repository:
 
 - https://github.com/netumscan/scanner-sdk-android
 
+Samples:
+
+- https://github.com/netumscan/scanner-sdk-samples
+
 Documentation:
 
 - [Android integration](docs/android.md)

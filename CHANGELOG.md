@@ -1,51 +1,62 @@
 # Release 0.1.1
 
-本次版本主要是发版收口和 demo 质量修正，没有改架构方向，重点是把查询接口迁移、demo 双语、Android 兼容警告和发布文档一起收干净。
+This release closes the first public mobile SDK packaging pass. It focuses on
+query API cleanup, bilingual sample-app polish, Android compatibility warning
+cleanup, and release documentation.
 
 ## Added
 
-- 补齐蓝牙 SSI 文档缺失主控指令
-- `core` / `api-c` / Android / Swift 同步新增蓝牙查询控制、解码模组切换、立即扫描、`%KB#SP0`、整套 `$BUZZ#B0` 到 `$BUZZ#BJ`
-- `ScannerInfo` 新增蓝牙固件版本、蓝牙名称、蓝牙地址、解码模组
-- `ScannerConfig` 曾补齐接口模式、键盘口速、BT HID 延时、当前字符集、当前接收设备、键盘布局、终端符；后续已降为内部兼容模型，不再作为公开查询主入口
-- 新增主动读取接口：
+- Added missing Bluetooth SSI master-command documentation.
+- Added Bluetooth query controls, decoder module switching, immediate scan,
+  `%KB#SP0`, and the `$BUZZ#B0` through `$BUZZ#BJ` buzzer command set across
+  `core`, `api-c`, Android, and Swift.
+- Added Bluetooth firmware version, Bluetooth name, Bluetooth address, and
+  decoder module fields to `ScannerInfo`.
+- Added active read APIs:
   - C API: `nsdk_refresh_info` / `nsdk_get_battery_info`
   - Kotlin: `refreshInfo()` / `getBatteryInfo()`
   - Swift: `refreshInfo()` / `getBatteryInfo()`
-- 新增缓存读取接口：
+- Added cached info APIs:
   - C API: `nsdk_get_cached_info`
   - Kotlin: `getCachedInfo()`
   - Swift: `getCachedInfo()`
 
 ## Changed
 
-- 发布许可改为 `Netum Scanner SDK License`：SDK 可免费商用集成，代码闭源，禁止作为独立 SDK、组件库或源码包再分发。
-- 查询链路后续已收敛为最小初始化，不再保留全量配置查询 API
-- demo 状态展示优先走 typed model 和 session cache
-- C API smoke sample 改为示范 `refresh + cached`
-- 清理 legacy `getInfo/getConfig` API
-- Android / iPhone demo 文档补齐双页结构、双语切换和日志导出说明
+- Changed the release license to `Netum Scanner SDK License`: the SDK is free
+  for commercial application integration, closed-source, and must not be
+  redistributed as a standalone SDK, component library, or source package.
+- Reduced initialization queries to the minimum required path and removed the
+  full public configuration-query API.
+- Updated sample-app state displays to prefer typed models and session cache.
+- Updated the C API smoke sample to demonstrate `refresh + cached`.
+- Removed legacy `getInfo/getConfig` APIs.
+- Updated Android and iPhone sample documentation for two-page layout, bilingual
+  switching, and log export behavior.
 
 ## Fixed
 
-- 修正 `$MOTO#0 / $MOTO#1` 开关语义和反向解析错误
-- 修正 ACK-only 流式响应等待首条记录时的超时处理
-- 修正 ACK-only 主控命令无法回填 session 配置缓存
-- 修正文本文令入口和枚举命令入口缓存更新不一致
-- 修正 Android demo `ScannerInfo` JNI 构造签名不匹配
-- 修正 Android / iOS demo 双语切换后快捷操作、命令分组等文案被冻结
-- 修正 Android demo 页面未避开系统状态栏 / 导航栏
-- 压掉 Android `compileSdk 35` 提示和 BLE 旧 API warning 噪音
+- Fixed reversed parsing and switch semantics for `$MOTO#0 / $MOTO#1`.
+- Fixed timeout handling while waiting for the first record in ACK-only streaming
+  responses.
+- Fixed ACK-only master commands not updating the session configuration cache.
+- Fixed inconsistent cache updates between text-command and enum-command entry
+  points.
+- Fixed the Android sample `ScannerInfo` JNI constructor signature mismatch.
+- Fixed frozen quick-action and command-group text after Android / iOS sample
+  language switching.
+- Fixed Android sample layout not avoiding system status and navigation bars.
+- Suppressed Android `compileSdk 35` guidance noise and old BLE API warnings.
 
-## Docs
+## Documentation
 
-- 更新 `README.md`
-- 更新 `docs/guides/demo/android-demo.md`
-- 更新 `docs/guides/platforms/ios.md`
-- 更新 `docs/guides/testing/device-regression-checklist.md`
+- Updated `README.md`.
+- Updated Android sample documentation.
+- Updated iOS platform documentation.
+- Updated device regression checklist documentation.
 
 ## Validation
 
-- `ctest` 全通过
-- `./gradlew test` 全通过
-- `swift test` 全通过
+- `ctest` passed.
+- `./gradlew test` passed.
+- `swift test` passed.
