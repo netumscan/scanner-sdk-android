@@ -19,6 +19,7 @@
 
 ## Changed
 
+- 发布许可改为 `Netum Scanner SDK License`：SDK 可免费商用集成，代码闭源，禁止作为独立 SDK、组件库或源码包再分发。
 - 查询链路后续已收敛为最小初始化，不再保留全量配置查询 API
 - demo 状态展示优先走 typed model 和 session cache
 - C API smoke sample 改为示范 `refresh + cached`

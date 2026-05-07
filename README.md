@@ -22,6 +22,14 @@ Documentation:
 - [Permissions](docs/permissions.md)
 - [Security and privacy](docs/security-and-privacy.md)
 - [Release notes](releases/v0.1.1/release-notes.md)
+- [License](LICENSE)
+
+License:
+
+- Free for commercial application integration and redistribution as part of
+  your applications.
+- Closed-source. Do not redistribute the SDK as a standalone SDK, source
+  package, component library, or competing product.
 
 This repository is the public distribution entry. The private development
 repository is not required for customer integration.
