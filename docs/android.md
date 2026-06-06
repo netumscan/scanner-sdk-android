@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.netumscan:scanner-sdk-android:0.1.2")
+    implementation("com.netumscan:scanner-sdk-android:0.1.3")
 }
 ```
 
