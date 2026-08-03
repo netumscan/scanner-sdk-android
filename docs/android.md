@@ -2,7 +2,7 @@
 
 ## Installation
 
-For the public release, integrate the SDK through the Maven AAR:
+Integrate version `1.0.0` through Maven Central:
 
 ```kotlin
 repositories {
@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.netumscan:scanner-sdk-android:0.1.4")
+    implementation("com.netumscan:scanner-sdk-android:1.0.0")
 }
 ```
 
@@ -26,7 +26,7 @@ Current Android SDK build requirements:
 - `minSdk = 26`
 - `compileSdk = 35`
 - Java / Kotlin JVM target: `17`
-- NDK: `26.1.10909125`
+- NDK: `28.2.13676358`
 - CMake: `3.22.1`
 - The AAR includes native libraries built by Gradle and CMake. Confirm the ABI
   list before shipping to a target device fleet.
@@ -36,10 +36,10 @@ Current Android SDK build requirements:
 1. Select the scanner model being tested.
 2. Initialize the SDK.
 3. Request Bluetooth and nearby-device permissions.
-4. Call `startDiscovery(..., selectedModelId = ...)`.
+4. Call `startDiscovery(..., selectedModelKey = ...)`.
 5. Observe `discoveryEvents` and `discoveryFailures`.
 6. Connect to the target device.
-7. After the session reaches `READY`, read `getResolvedModelId()` and
+7. After the session reaches `READY`, read `getResolvedModelKey()` and
    `getDeviceCapabilitySummary()`.
 8. Observe `scanEvents` and `failures`.
 9. Read or update device configuration only after the session is ready.
@@ -55,7 +55,8 @@ the host manifest so reviews and privacy disclosures are explicit:
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
 <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
 
 Only add `android:usesPermissionFlags="neverForLocation"` to
@@ -69,6 +70,8 @@ val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
     arrayOf(
         Manifest.permission.BLUETOOTH_SCAN,
         Manifest.permission.BLUETOOTH_CONNECT,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
     )
 } else {
     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -91,8 +94,8 @@ Before calling `startDiscovery(...)`, confirm:
 - Discovery does not report BLE devices with an empty Bluetooth name.
 - If advertisements cannot identify the model reliably, the model selected by
   the integrating app remains the business source of truth.
-- `connectReady(..., selectedModelId = ...)` stores the selected model in the
-  session; without an explicit selection it falls back to `device.modelId`.
+- `connectReady(..., selectedModelKey = ...)` stores the selected model in the
+  session; without an explicit selection it falls back to `device.modelKey`.
 - After connection, discovery and resolved-model data should be treated as
   diagnostics, not as a replacement for the app-selected model.
 
@@ -100,31 +103,38 @@ Before calling `startDiscovery(...)`, confirm:
 
 `ScannerSdk`:
 
-- `startDiscovery(transports, selectedModelId)`
+- `version`
+- `startDiscovery(transports, selectedModelKey)`
 - `connectReady(...)`
 - `discoveryEvents`
 - `discoveryFailures`
 - `sessionFailures`
-- `getDeviceModelProfile(modelId)`
+- `getDeviceModelProfile(modelKey)`
+- `getCapabilityDomains(modelKey, transportType)`
+- `getCapabilityEntries(modelKey, transportType)`
+- `findCapabilityEntry(modelKey, transportType, entryKey)`
 
 `ScannerSession`:
 
 - `state`
 - `scanEvents`
 - `failures`
-- `getResolvedModelId()`
-- `setPreferredModel(...)`
+- `getResolvedModelKey()`
 - `getDeviceCapabilitySummary()`
-- `canExecuteMasterCommand(...)`
-- `canExecuteModuleCommand(...)`
-- `canExecuteDefaultModuleCommandProbe(...)`
+- `getCapabilityDomains()`
+- `getCapabilityEntries()`
+- `findCapabilityEntry(entryKey)`
+- `readCapabilityValue(entryKey)`
+- `writeCapabilityValue(entryKey, value, persist = true)`
+- `executeCapabilityAction(entryKey, valueBytes = byteArrayOf())`
 
-For configuration UI or diagnostic panels, use the public runtime metadata:
+For configuration UI or action panels, use the public runtime metadata:
 
-- `getNt212xParameterDefinitions()`
-- `getNt280hParameterDefinitions()`
-- `getSe4750ParameterDefinitions()`
-- `getNtc06hSettingDefinitions()`
+- `CapabilityDomain`
+- `CapabilityEntry`
+- `CapabilityEntry.kind`
+- `CapabilityEntry.transportScopes`
+- `CapabilityEntry.availability`
 
 ## Error Handling
 
@@ -136,9 +146,9 @@ try {
     val session = ScannerSdk.connectReady(
         deviceId = device.deviceId,
         transportType = device.transportType,
-        selectedModelId = selectedModelId,
+        selectedModelKey = selectedModelKey,
     )
-    session.initializeSession()
+    session.initialize()
 } catch (error: ScannerException) {
     Log.e("ScannerSdk", "operation=${error.operation} code=${error.errorCode}", error)
 }

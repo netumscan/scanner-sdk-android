@@ -6,12 +6,15 @@ logs, issue reports, and screenshots must not expose raw scan content by default
 ## Logging
 
 - Do not log full scan content by default.
-- Only log scan content in a user-enabled debug mode.
+- The official mobile demos never persist or export scan plaintext or raw hex;
+  they retain only scan type, charset, and byte lengths.
 - Redact issue reports, regression records, and screenshots before sharing.
 - Do not log tokens, certificates, authorization headers, Bluetooth pairing
   information, or customer-private device identifiers.
 - Failure logs should keep error code, platform, transport, state-machine step,
   and payload length instead of sensitive payloads.
+- The official demos do not upload logs. Export is an explicit local user
+  action and applies redaction again before writing the file.
 
 ## Permission Disclosure
 

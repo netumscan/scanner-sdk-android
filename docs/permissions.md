@@ -8,7 +8,8 @@ failures when these requirements are not met.
 
 BLE GATT requirements:
 
-- Android 12+: `BLUETOOTH_SCAN` and `BLUETOOTH_CONNECT`.
+- Android 12+: `BLUETOOTH_SCAN` and `BLUETOOTH_CONNECT`; validated target ROMs
+  can also require coarse/fine location permission before discovery returns devices.
 - Android 11 and below: location permission and location services are commonly
   required for BLE scanning.
 - Runtime permissions must be granted before discovery.
@@ -21,7 +22,8 @@ Recommended manifest:
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
 <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
 
 `BLUETOOTH_SCAN` with `neverForLocation` is not the default recommendation. Use
@@ -43,7 +45,7 @@ Recommended order:
 1. Check Bluetooth hardware availability.
 2. Check whether Bluetooth is enabled.
 3. Request runtime permissions.
-4. Check location services on Android 11 and below.
+4. Check the target ROM's required location permissions and location services.
 5. Call `startDiscovery()`.
 
 ## iOS
