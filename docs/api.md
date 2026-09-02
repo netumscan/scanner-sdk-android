@@ -19,3 +19,7 @@
 Catch `ScannerException` and retain its operation and SDK error code. For
 asynchronous failures, observe the SDK and session failure streams instead of
 relying only on thrown exception messages.
+
+Native loading and ABI compatibility are enforced automatically before SDK
+initialization. See [Android native compatibility](android.md#native-compatibility)
+for supported CPU ABIs and load-versus-version troubleshooting.

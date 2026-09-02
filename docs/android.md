@@ -2,7 +2,7 @@
 
 ## Installation
 
-Integrate version `1.0.0` through Maven Central:
+Integrate version `1.1.0` through Maven Central:
 
 ```kotlin
 repositories {
@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.netumscan:scanner-sdk-android:1.0.0")
+    implementation("com.netumscan:scanner-sdk-android:1.1.0")
 }
 ```
 
@@ -30,6 +30,33 @@ Current Android SDK build requirements:
 - CMake: `3.22.1`
 - The AAR includes native libraries built by Gradle and CMake. Confirm the ABI
   list before shipping to a target device fleet.
+
+## Native Compatibility
+
+Android CPU ABI and the Scanner SDK C ABI are different compatibility layers:
+
+- The release AAR contains `libScannerSDKNative.so` for `arm64-v8a`,
+  `armeabi-v7a`, `x86`, and `x86_64`.
+- The Kotlin/JNI wrapper requires Scanner SDK C ABI `0x010000`.
+
+`ScannerSdk.initialize(...)` loads `ScannerSDKNative`, checks native ABI
+compatibility, and only then initializes the runtime and registers callbacks.
+Applications do not need to call a low-level ABI function. Do not unpack the
+AAR to replace a `.so`, and do not combine Kotlin/JNI classes and native
+libraries from different SDK releases.
+
+If initialization fails, identify the stage first:
+
+- `UnsatisfiedLinkError` indicates a missing or unloadable `.so`, or a device
+  CPU ABI removed by the host application's `abiFilters` or split settings.
+- `Scanner SDK native ABI mismatch: required=...` indicates that Kotlin/JNI and
+  the native library came from different or incompatible releases. Restore one
+  complete Maven version; do not bypass the check.
+- A stable Scanner SDK error code means loading and ABI validation succeeded.
+  Continue diagnosis using the operation, error code, and failure events.
+
+Before shipping, inspect the final APK/AAB as well as the input AAR. Host build
+configuration can remove an architecture even when the Maven AAR contains it.
 
 ## Recommended Flow
 
