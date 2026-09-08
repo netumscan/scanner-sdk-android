@@ -2,7 +2,7 @@
 
 ## Installation
 
-Integrate version `1.1.0` through Maven Central:
+Integrate version `1.1.1` through Maven Central:
 
 ```kotlin
 repositories {
@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.netumscan:scanner-sdk-android:1.1.0")
+    implementation("com.netumscan:scanner-sdk-android:1.1.1")
 }
 ```
 
