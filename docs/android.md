@@ -2,7 +2,7 @@
 
 ## Installation
 
-Integrate version `1.1.1` through Maven Central:
+Integrate version `2.0.0` through Maven Central:
 
 ```kotlin
 repositories {
@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.netumscan:scanner-sdk-android:1.1.1")
+    implementation("com.netumscan:scanner-sdk-android:2.0.0")
 }
 ```
 
@@ -116,9 +116,8 @@ Before calling `startDiscovery(...)`, confirm:
 ## Key Behavior
 
 - Android BLE uses the `scanner_master` profile by default.
-- Pass the selected scanner model into discovery so candidates can be filtered
-  by known model fingerprints.
-- Discovery does not report BLE devices with an empty Bluetooth name.
+- BLE discovery returns all platform-discovered devices, including unnamed devices; the app chooses candidates.
+- `selectedModelKey` is ignored for BLE discovery. Discovered model and match reason are empty; keep the selected model for connection.
 - If advertisements cannot identify the model reliably, the model selected by
   the integrating app remains the business source of truth.
 - `connectReady(..., selectedModelKey = ...)` stores the selected model in the
