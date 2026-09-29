@@ -2,13 +2,13 @@
 
 Public Android distribution repository for Netum Scanner SDK.
 
-Current version: 2.0.0
+Current version: 2.0.1
 
 Maven coordinate:
 
 ```kotlin
 dependencies {
-    implementation("com.netumscan:scanner-sdk-android:2.0.0")
+    implementation("com.netumscan:scanner-sdk-android:2.0.1")
 }
 ```
 
@@ -31,7 +31,7 @@ Documentation:
 - [Compatibility](docs/compatibility.md)
 - [Known limitations](docs/known-limitations.md)
 - [Support](docs/support.md)
-- [Release notes](releases/v2.0.0/release-notes.md)
+- [Release notes](releases/v2.0.1/release-notes.md)
 - [License](LICENSE)
 
 License:
