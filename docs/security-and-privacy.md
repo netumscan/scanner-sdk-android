@@ -32,7 +32,7 @@ Customers should not have to infer why a permission is required.
 
 - Official release artifacts must come from reproducible scripts or CI.
 - Release packages must include version, checksum, and generation source.
-- Release packages must carry the `Netum Scanner SDK License`. The SDK is free
+- Release packages must carry the `Scanner SDK License`. The SDK is free
   for commercial application integration, closed-source, and must not be
   redistributed as a standalone SDK or component.
 - Do not use local temporary build directories as official distribution entry

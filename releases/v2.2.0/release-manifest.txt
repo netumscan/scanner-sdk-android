@@ -1,0 +1,8 @@
+version=2.2.0
+sdkCommit=651d19a5ddb52110b680552df349fe7652928cd9
+workflowRunId=local
+mavenCoordinate=com.netumscan:scanner-sdk-android:2.2.0
+aarFile=scanner-sdk-android-2.2.0.aar
+aarSha256=b058d2550197d39244be005731bd13db089f2c31807bead676cc699ee658fec8
+bundleFile=central-bundle.zip
+bundleSha256=3af62decc53c00e52783d8dda7915aedcd94e206693ac869260c2f3cff0eef05
